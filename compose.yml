@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: ./deathbeds-back
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./deathbeds-back:/app
+  frontend:
+    build: ./deathbeds-front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./deathbeds-front:/app
+    depends_on:
+      - backend
+  postgres:
+    image: postgres:latest
+    container_name: deathbeds-database
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
