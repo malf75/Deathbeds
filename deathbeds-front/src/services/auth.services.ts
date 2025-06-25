@@ -31,7 +31,7 @@ export const authServices = {
     return data;
   },
 
-  async verificaOtp (id: number, otp: string) {
+  async verificaOtp (id: number, otp: string | null) {
     const { data } = await http.post(`${baseURL}/m2f/${id}?otp=${otp}`, {
       headers: {
         'Content-Type': 'Application/json',
@@ -41,5 +41,17 @@ export const authServices = {
       Cookies.set('access_token', data['tokens'][0]['access_token'], { expires: 0.2/24 });
       Cookies.set('refresh_token', data['tokens'][1]['refresh_token'], { expires: 1 });
     }
+  },
+
+  async verificaToken (token: string | undefined) {
+    const { data } = await http.get(`${baseURL}/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (data.email) {
+      return true;
+    }
+    return data;
   },
 }

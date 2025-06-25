@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 const route = useRouter();
 
 const http = axios.create({
-  baseURL: 'http://10.10.14.190:8000/',
+  baseURL: 'http://127.0.0.1:8000/',
   withCredentials: true,
 });
 
@@ -26,10 +26,10 @@ http.interceptors.response.use(
       try {
         const refreshToken = Cookies.get('refresh_token');
         const { data } = await http.post('/auth/token/refresh', {
-          refresh_token: refreshToken,
+          token: refreshToken,
         });
-        Cookies.set('access_token', data.access_token);
-        Cookies.set('refresh_token', data.refresh_token)
+        Cookies.set('access_token', data[0].access_token);
+        Cookies.set('refresh_token', data[1].refresh_token);
         return http(originalRequest);
       } catch (refreshError) {
         console.log(refreshError);

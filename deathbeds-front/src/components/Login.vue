@@ -65,9 +65,11 @@
     }
   }
 
-  onMounted(() =>{
-    if (Cookies.get('access_token') || Cookies.get('refresh_token')) {
-      router.push('/timeline')
+  onMounted(async () =>{
+    const verificaToken = await authServices.verificaToken(Cookies.get('access_token'));
+    if (verificaToken) {
+      console.log(verificaToken)
+      router.push('/timeline');
     }
     form.acao = 'login'
   })
