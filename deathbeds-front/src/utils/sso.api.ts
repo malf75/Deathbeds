@@ -1,11 +1,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useRouter } from 'vue-router';
-
-const route = useRouter();
 
 const http = axios.create({
-  baseURL: 'http://127.0.0.1:8000/',
+  baseURL: 'http://192.168.1.237:8000/',
   withCredentials: true,
 });
 
@@ -23,18 +20,13 @@ http.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      try {
-        const refreshToken = Cookies.get('refresh_token');
-        const { data } = await http.post('/auth/token/refresh', {
-          token: refreshToken,
-        });
-        Cookies.set('access_token', data[0].access_token);
-        Cookies.set('refresh_token', data[1].refresh_token);
-        return http(originalRequest);
-      } catch (refreshError) {
-        console.log(refreshError);
-        route.push('/login');
-      }
+      const refreshToken = Cookies.get('refresh_token');
+      const { data } = await http.post('/auth/token/refresh', {
+        token: refreshToken,
+      });
+      Cookies.set('access_token', data[0].access_token);
+      Cookies.set('refresh_token', data[1].refresh_token);
+      return http(originalRequest);
     }
     return Promise.reject(error);
   }

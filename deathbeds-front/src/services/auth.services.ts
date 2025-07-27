@@ -49,9 +49,6 @@ export const authServices = {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (data.email) {
-      return true;
-    }
     return data;
   },
 }
