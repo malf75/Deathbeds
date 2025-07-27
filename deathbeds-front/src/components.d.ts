@@ -8,6 +8,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppChamada: typeof import('./components/AppChamada.vue')['default']
+    AppChat: typeof import('./components/AppChat.vue')['default']
+    AppSearch: typeof import('./components/AppSearch.vue')['default']
+    AppSidebar: typeof import('./components/AppSidebar.vue')['default']
+    AppTimeline: typeof import('./components/AppTimeline.vue')['default']
     Login: typeof import('./components/Login.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
