@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import { postagemServices } from '@/services/postagem.service';
+  import iziToast from '@/plugins/iziToast'
+
   const postagens = ref([]);
   const quantidade = ref(0);
   const loading = ref(false);
@@ -20,9 +22,25 @@
 
   async function criaPostagem () {
     loading.value = true;
-    await postagemServices.posta(postagem);
-    await fetchPostagens();
-    loading.value = false;
+    try {
+      await postagemServices.posta(postagem);
+      iziToast.success({
+        title: "Sucesso",
+        message: "Postagem realizada com sucesso",
+        timeout: 1000000,
+      });
+      loading.value = false;
+    } catch {
+      iziToast.error({
+        title: "Erro",
+        message: "Erro ao realizar postagem",
+        timeout: 3000,
+      });
+      loading.value = false;
+    }
+    quantidade.value = 0;
+    tries.value = 0;
+    await load({ done: () => {} });
   }
 
   async function fetchPostagens () {
@@ -41,19 +59,13 @@
       } else {
         done('ok');
       }
-      console.log (tries)
     }, 1000)
   }
 
-  watch(() => props.usuario.id, async (id) => {
+  watch(() => props.usuario.id, async id => {
     if (id) {
-      postagem.id = await props.usuario.id;
+      postagem.id = id;
     }
-  })
-
-  onMounted(async () => {
-    await fetchPostagens();
-    console.log(postagens);
   })
 
 </script>
@@ -126,5 +138,5 @@
         </template>
       </v-infinite-scroll>
     </v-col>
-</v-row>
+  </v-row>
 </template>

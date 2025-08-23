@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppAllChats: typeof import('./components/AppAllChats.vue')['default']
     AppChamada: typeof import('./components/AppChamada.vue')['default']
     AppChat: typeof import('./components/AppChat.vue')['default']
     AppSearch: typeof import('./components/AppSearch.vue')['default']

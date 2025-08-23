@@ -13,12 +13,8 @@ export const authServices = {
     return data;
   },
 
-  async cadastro (cadastro: object) {
-    const { data } = await http.post(`${baseURL}/signup`, cadastro, {
-      headers: {
-        'Content-Type': 'Application/json',
-      },
-    });
+  async cadastro (cadastro: FormData) {
+    const { data } = await http.post(`${baseURL}/signup`, cadastro);
     return data;
   },
 
@@ -50,5 +46,14 @@ export const authServices = {
       },
     });
     return data;
+  },
+
+  async refreshToken (refreshToken: string) {
+    const refresh = await http.post('/auth/token/refresh', {
+      token: refreshToken,
+    });
+    Cookies.set('access_token', refresh.data[0].access_token);
+    Cookies.set('refresh_token', refresh.data[1].refresh_token);
+    return refresh.data[0].access_token;
   },
 }

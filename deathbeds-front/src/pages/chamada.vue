@@ -2,6 +2,7 @@
 
   const props = defineProps<{
     usuario: Ref<object>,
+    websocket: Ref<object>,
   }>();
 
 </script>

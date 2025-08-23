@@ -25,12 +25,6 @@
     },
   }>();
 
-  const data = reactive({
-    socket: null,
-    userId: null,
-    targetUserId: 2,
-  });
-
   async function criaOferta () {
     peerConnection = new RTCPeerConnection(servers);
     remoteStream = new MediaStream();
@@ -58,27 +52,10 @@
     console.log('Oferta:', oferta)
   }
 
-  async function iniciaWebSocket () {
-    data.socket = await chamadaService.conectaWebsocket(data.userId);
-    data.socket.onopen = () => {
-      console.log("WebSocket conectado");
-    };
-
-    data.socket.onmessage = (event) => {
-      const response = JSON.parse(event.data);
-      console.log("Recebido do servidor:", response);
-      trataSinal(response);
-    }
-
-    data.socket.onclose = () => {
-      console.log("WebSocket desconectado");
-    }
-  }
 
   watch(() => props.usuario.id, async (id) => {
     if (id && !data.socket) {
       data.userId = await props.usuario.id;
-      await iniciaWebSocket();
     }
   })
 
@@ -97,8 +74,8 @@
       :width="100"
     />
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2em;">
-      <video style="background-color: black; width: 100%; height: 420px;" id="user-1" autoplay playsinline muted></video>
-      <video style="background-color: black; width: 100%; height: 420px;" id="user-2" autoplay playsinline></video>
+      <video style="background-color: black; width: 100%; height: 420px; border: 2px solid rgb(76, 175, 80); border-radius: 20px;" id="user-1" autoplay playsinline muted></video>
+      <video style="background-color: black; width: 100%; height: 420px; border: 2px solid rgb(76, 175, 80); border-radius: 20px;" id="user-2" autoplay playsinline></video>
     </div>
   </div>
 </template>

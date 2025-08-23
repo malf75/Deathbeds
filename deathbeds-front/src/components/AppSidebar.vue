@@ -63,6 +63,7 @@
             justify-content: start;
             padding: 0 0 0 1em;"
             variant="plain"
+            @click="router.push('/chat')"
           >
             Mensagens
           </v-btn>
