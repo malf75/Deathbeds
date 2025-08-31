@@ -14,7 +14,8 @@
 
   const props = defineProps<{
     usuario: { id: number, nome: string },
-    idChat: number
+    idChat: number,
+    atendimento: boolean,
   }>();
 
   defineEmits<{
@@ -31,9 +32,21 @@
     return novoChat.destinatarios_id.length > 0 && novoChat.nome.length < 51
   })
 
-  async function retornaChats () {
+  async function retornaChatsPadrao () {
     try {
-      chats.value = await chatServices.listaChat(props.usuario.id, quantidadeChats.value)
+      chats.value = await chatServices.listaChatPadrao(props.usuario.id, quantidadeChats.value)
+    } catch (e) {
+      iziToast.error({
+        title: 'Erro',
+        message: e.response.data.detail,
+        timeout: 3000,
+      })
+    }
+  }
+
+  async function retornaChatsAtendimento () {
+    try {
+      chats.value = await chatServices.listaChatAtendimento(props.usuario.id, quantidadeChats.value)
     } catch (e) {
       iziToast.error({
         title: 'Erro',
@@ -65,7 +78,7 @@
     }
     quantidadeChats.value = 0;
     triesChats.value = 0;
-    await loadChats({ done: () => {} });
+    await loadChatsPadrao({ done: () => {} });
   }
 
   async function retornaSeguindo () {
@@ -88,11 +101,26 @@
     }, 1000)
   }
 
-  async function loadChats ({ done }) {
+  async function loadChatsPadrao ({ done }) {
     setTimeout(async () => {
       triesChats.value += 1;
       quantidadeChats.value += 5;
-      await retornaChats();
+      await retornaChatsPadrao();
+      if (chats.value.length === 0) {
+        done('empty');
+      } else if (triesChats.value === 3) {
+        done('empty');
+      } else {
+        done('ok');
+      }
+    }, 1000)
+  }
+
+  async function loadChatsAtendimento ({ done }) {
+    setTimeout(async () => {
+      triesChats.value += 1;
+      quantidadeChats.value += 5;
+      await retornaChatsAtendimento();
       if (chats.value.length === 0) {
         done('empty');
       } else if (triesChats.value === 3) {
@@ -111,9 +139,10 @@
 
 </script>
 <template>
-  <v-row style="padding: 0.5em 0.2em 0.5em 0.5em; display: flex; align-items: center; justify-content: space-between;">
-    <h2 style="color: rgb(76, 175, 80);">Mensagens</h2>
-    <v-btn color="success" icon="mdi-message-plus" variant="text" @click="dialog = true" />
+  <v-row style="padding: 0.5em 0.2em 0.5em 0.8em; display: flex; align-items: center; justify-content: space-between;">
+    <h2 v-if="!props.atendimento" style="color: rgb(76, 175, 80);">Mensagens</h2>
+    <h2 v-else style="color: rgb(76, 175, 80);">Atendimentos</h2>
+    <v-btn v-if="!props.atendimento" color="success" icon="mdi-message-plus" variant="text" @click="dialog = true" />
   </v-row>
   <v-row style="padding: 0.5em;">
     <v-text-field
@@ -129,7 +158,7 @@
     color="success"
   />
   <v-row style="display: flex; justify-content: center;">
-    <v-infinite-scroll color="success" style="display: flex; align-items: center; padding: 0.5em;" @load="loadChats">
+    <v-infinite-scroll v-if="useRoute().path === '/chat'" color="success" style="display: flex; align-items: center; padding: 0.5em;" @load="loadChatsPadrao">
       <v-card
         v-for="chat in chats.data"
         :key="chat.id"
@@ -140,6 +169,47 @@
       >
         <v-card-title style="display: flex; justify-content: space-between; align-items: center;">
           <span style="font-weight: bold; color: rgb(76, 175, 80);">{{ chat.nome }}</span>
+        </v-card-title>
+
+        <v-card-subtitle>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1em;">
+            <v-chip
+              color="success"
+              small
+              text-color="white"
+            >
+              {{ chat.criador }}
+            </v-chip>
+            <v-chip
+              v-for="participante in chat.participantes.slice(0,2)"
+              :key="participante.id"
+              color="success"
+              small
+              text-color="white"
+            >
+              {{ participante.nome }}
+            </v-chip>
+            <span v-if="chat.participantes.length > 2" style="font-weight: bold; font-size: 14px; color: rgb(76, 175, 80); align-self: center;">
+              +{{ chat.participantes.length - 2 }}
+            </span>
+          </div>
+        </v-card-subtitle>
+      </v-card>
+      <template #empty>
+        <v-alert color="success" style="display: flex; justify-content: center;" type="warning" variant="text">Nenhum Chat Encontrado!</v-alert>
+      </template>
+    </v-infinite-scroll>
+    <v-infinite-scroll v-if="useRoute().path === '/atendimento'" color="success" style="display: flex; align-items: center; padding: 0.5em;" @load="loadChatsAtendimento">
+      <v-card
+        v-for="chat in chats.data"
+        :key="chat.id"
+        hover
+        style="border: 1px solid rgb(76, 175, 80); border-radius: 20px; margin-bottom: 10px; width: 300px;"
+        variant="text"
+        @click="$emit('update:idChat', chat.id)"
+      >
+        <v-card-title style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: bold; color: rgb(76, 175, 80);">{{ chat.participantes[0].nome }}</span>
         </v-card-title>
 
         <v-card-subtitle>

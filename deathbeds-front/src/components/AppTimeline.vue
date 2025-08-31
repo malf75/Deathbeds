@@ -8,7 +8,7 @@
   const tries = ref(0);
 
   const props = defineProps<{
-    usuario: Ref<object>,
+    usuario: object,
   }>();
 
   const postagem = reactive({
@@ -38,6 +38,7 @@
       });
       loading.value = false;
     }
+    postagem.corpo = null;
     quantidade.value = 0;
     tries.value = 0;
     await load({ done: () => {} });
@@ -124,9 +125,16 @@
         >
           <v-card-title style="display: flex; align-items: center;">
             <v-avatar image="/No_avatar.png" size="50" style="border: 1px solid greenyellow; cursor: pointer;" />
-            <p style="margin-left: 0.5em; font-size: 16px; margin-right: 0.5em;">{{ post.usuario }}</p>
-            •
-            <p style="margin-left: 0.5em; font-size: 14px;">{{ post.criado_em.replace(",", "") }}</p>
+            <p style="margin-left: 0.5em; font-size: 16px;">{{ post.usuario }}</p>
+            <v-icon
+              v-if="post.tipo_usuario_id === 2"
+              color="success"
+              icon="mdi-pill"
+              size="x-small"
+              style="margin-left: 0.2em;"
+            />
+            <p style="margin-left: 0.2em;">•</p>
+            <p style="margin-left: 0.5em; font-size: 14px; font-weight: 300;">{{ post.criado_em.replace(",", "") }}</p>
           </v-card-title>
           <v-card-text style="padding: 16px 20px 16px 20px;">
             {{ post.corpo }}

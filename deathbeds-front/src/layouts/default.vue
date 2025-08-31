@@ -7,31 +7,59 @@
   const tries = ref(0);
   const notificacao = ref(null);
   const color = ref('');
+  const router = useRouter();
   const user = reactive({
     id: null,
     nome: null,
+    tipo: null,
   });
   const websocket = reactive({
     socket: null,
   })
+  const ligacao = ref(false);
+  const destino = ref({})
 
   async function iniciaWebSocket (token: string) {
     const socket = await websocketService.conectaWebsocket(token);
     websocket.socket = socket;
-    socket.onopen = () => {
-      console.log('WebSocket conectado');
-    };
+  }
 
-    socket.onmessage = event => {
-      const response = JSON.parse(event.data);
-      if (response.tipo === 'notificacao') {
-        notificacao.value = response.message;
+  watch(
+    () => websocket.socket,
+    socket => {
+      if (socket) {
+        socket.onmessage = event => {
+          const response = JSON.parse(event.data);
+          if (response.type === 'notificacao') {
+            notificacao.value = response.message;
+          }
+          if (response.type === 'call_request') {
+            ligacao.value = true;
+            destino.value = { 'id': response['destino_id'], 'nome': response['destino']};
+            setTimeout(() => {
+              ligacao.value = false;
+            }, 30000)
+          }
+        }
       }
     }
+  );
 
-    socket.onclose = () => {
-      console.log('WebSocket desconectado');
-    };
+  async function rejeitaLigacao () {
+    websocket.socket.send(JSON.stringify({
+      'type': 'call_request_rejected',
+      'destinatario_id': destino.value['id'],
+    }));
+    ligacao.value = false;
+  }
+
+  async function aceitaLigacao () {
+    websocket.socket.send(JSON.stringify({
+      'type': 'call_request_accepted',
+      'destinatario_id': destino.value['id'],
+    }));
+    ligacao.value = false;
+    router.push('/chamada');
   }
 
   async function iniciaConexao (token) {
@@ -39,6 +67,7 @@
     if (response.id) {
       user.id = response.id;
       user.nome = response.nome;
+      user.tipo = response.tipo;
       await iniciaWebSocket(token);
     }
   }
@@ -84,6 +113,48 @@
 <template>
   <v-main :style="`background-color: ${color};`">
     <router-view :notificacao="notificacao" style="margin: 0;" :usuario="user" :websocket="websocket" />
+    <v-dialog v-model="ligacao" persistent style="justify-self: center;">
+      <v-card
+        class="pa-6 text-center"
+        elevation="10"
+        rounded="xl"
+        width="320"
+      >
+        <v-avatar size="100" class="mx-auto mb-4">
+          <v-img src="https://randomuser.me/api/portraits/women/44.jpg" />
+        </v-avatar>
+
+        <h3 class="mb-2">{{ destino['nome'] }}</h3>
+        <p class="text-grey">Chamando...</p>
+
+        <div class="dots mb-6">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <v-row style="display: flex; justify-content: center;">
+          <v-btn
+            color="red"
+            icon
+            size="large"
+            style="margin-right: 1em;"
+            variant="tonal"
+            @click="rejeitaLigacao"
+          >
+            <v-icon>mdi-phone-hangup</v-icon>
+          </v-btn>
+          <v-btn
+            color="green"
+            icon
+            size="large"
+            variant="tonal"
+            @click="aceitaLigacao"
+          >
+            <v-icon>mdi-phone</v-icon>
+          </v-btn>
+        </v-row>
+      </v-card>
+    </v-dialog>
   </v-main>
 </template>
 <style>

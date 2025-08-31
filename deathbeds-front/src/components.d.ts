@@ -11,6 +11,8 @@ declare module 'vue' {
     AppAllChats: typeof import('./components/AppAllChats.vue')['default']
     AppChamada: typeof import('./components/AppChamada.vue')['default']
     AppChat: typeof import('./components/AppChat.vue')['default']
+    AppHorarios: typeof import('./components/AppHorarios.vue')['default']
+    AppProfissionais: typeof import('./components/AppProfissionais.vue')['default']
     AppSearch: typeof import('./components/AppSearch.vue')['default']
     AppSidebar: typeof import('./components/AppSidebar.vue')['default']
     AppTimeline: typeof import('./components/AppTimeline.vue')['default']

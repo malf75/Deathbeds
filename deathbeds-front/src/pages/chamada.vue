@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
   const props = defineProps<{
-    usuario: Ref<object>,
-    websocket: Ref<object>,
+    usuario: object,
+    websocket: object,
   }>();
 
 </script>
 <template>
-  <AppChamada :usuario="props.usuario" />
+  <AppChamada :usuario="props.usuario" :websocket="websocket" />
 </template>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
-  const userRole = 'Profissional';
   const router = useRouter();
 
   const props = defineProps<{
-    usuario: Ref<object>,
+    usuario: object,
   }>();
 
 </script>
@@ -42,7 +41,7 @@
             Notificações
           </v-btn>
           <v-btn
-            v-if="userRole === 'Profissional'"
+            v-if="props.usuario.tipo === 'profissional'"
             color="success"
             prepend-icon="mdi-clipboard"
             rounded
@@ -51,8 +50,23 @@
             justify-content: start;
             padding: 0 0 0 1em;"
             variant="plain"
+            @click="router.push('/atendimento')"
           >
             Atendimentos
+          </v-btn>
+          <v-btn
+            v-if="props.usuario.tipo === 'comum'"
+            color="success"
+            prepend-icon="mdi-clipboard"
+            rounded
+            size="x-large"
+            style="display: flex;
+            justify-content: start;
+            padding: 0 0 0 1em;"
+            variant="plain"
+            @click="router.push('/profissionais')"
+          >
+            Profissionais
           </v-btn>
           <v-btn
             color="success"
