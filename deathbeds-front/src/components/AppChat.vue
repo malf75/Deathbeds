@@ -118,6 +118,8 @@
               'criado_em': response.criado_em,
             })
           }
+          container.value = document.getElementById('chatCard') as HTMLElement;
+          container.value.scrollTop = container.value.scrollHeight;
           if (response.type === 'call_request_rejected') {
             ligando.value = false;
           }
@@ -255,7 +257,7 @@
             </v-card>
             <v-row style="margin: 0 1em 0 1em;">
               <v-col>
-                <v-form>
+                <v-form @submit.prevent>
                   <v-row>
                     <v-col>
                       <v-row>
@@ -351,7 +353,7 @@
             </v-card>
             <v-row style="margin: 0 1em 0 1em;">
               <v-col>
-                <v-form>
+                <v-form @submit.prevent>
                   <v-row>
                     <v-col>
                       <v-row>

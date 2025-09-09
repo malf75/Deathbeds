@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const http = axios.create({
-  baseURL: `http://${import.meta.env.VITE_API_IP}:8000/`,
+  baseURL: `https://${import.meta.env.VITE_API_IP}:8000/`,
   withCredentials: true,
 });
 
@@ -23,7 +23,7 @@ http.interceptors.response.use(
       const refreshToken = Cookies.get('refresh_token');
       if (refreshToken) {
         try {
-          const { data } = await axios.post(`http://${import.meta.env.VITE_API_IP}:8000/auth/token/refresh`,
+          const { data } = await axios.post(`https://${import.meta.env.VITE_API_IP}:8000/auth/token/refresh`,
             { token: refreshToken },
             { withCredentials: true }
           );

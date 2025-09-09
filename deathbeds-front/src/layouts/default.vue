@@ -40,6 +40,9 @@
               ligacao.value = false;
             }, 30000)
           }
+          if (response.type === 'call_request_cancelled') {
+            ligacao.value = false;
+          }
         }
       }
     }
